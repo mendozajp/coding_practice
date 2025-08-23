@@ -82,3 +82,54 @@ class Solution:
 Its def closer but I got to a test that was failing for a reason i didnt know and decided to call it.
 We'll revisit this one later. 
 """
+
+
+
+"""
+8-23-25 Runback 1
+Started with a 20 minute timer. I mostly remembered my previous approach was pretty good but my final execution was laking. 
+So I set about in sort of the same mentatiliy but skipping ahead to the key sequence prepeneded. 
+Unfortunatly couldnt do it in 20 minutes. Kept forgetting about little things, and ended confusing myself with decode
+Encode got together very nicely, after the 20 minutes i looked at it for a second, started the timer again and in 11 minutes I got
+decode working as expected albiet a bit messy. 
+So it is. Conceptually I think we did fine. lot of inefficencies that we could talk about but I imagine they wont be relevant for an interview. 
+Worth revisiting again to see what we should be considering. Remember they care about the thought process as well. You slapping together a wild solution
+might not be what everyone wants to see. 
+Try thinking ahead a bit more. 
+Here's the code. This one is funcitonal
+"""
+
+class Solution:
+    def encode(self, strs: List[str]) -> str:
+        key_segment = []
+        for i in strs:
+            key_segment.append(str(len(i)))
+        key_segment = '~'.join(key_segment)
+        key_segment = str(len(key_segment)) + '~' + key_segment
+        print(key_segment)
+        res = key_segment + "".join(strs)
+        print(res)
+        return res
+
+
+    def decode(self, s: str) -> List[str]:
+        res = []
+        key_size = 0
+        key_length = 0
+        for idx, chara in enumerate(s):
+            if chara  == "~":
+                key_size = idx + 1
+                key_length = int(s[0:idx])
+                break
+        if key_length == 0:
+            print("something went wrong")
+            return []  
+        key = s[key_size:key_length + key_size].split('~')
+        key = [int(i) for i in key]
+        starting_index = key_length + key_size
+        counter = 0
+        for i in key:
+            res.append(s[starting_index + counter: starting_index + counter + i])
+            counter += i
+
+        return res

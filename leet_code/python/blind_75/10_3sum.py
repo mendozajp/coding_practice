@@ -141,3 +141,40 @@ r. And while to some extent that is right, it was a level deeper, where you actu
 several times through iterations. 
 So it goes. We'll try again in a few days.
 """
+
+
+"""
+hey hey, came back to try it again, remembered pretty well, check it out
+"""
+class Solution:
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        nums.sort()
+        res = []
+        for idx, i in enumerate(nums):
+            if idx > 0:
+                if i == nums[idx - 1]: continue
+            l, r = idx+1, len(nums) - 1
+            while l < r:
+                current_sum = i + nums[l] + nums[r]
+                if current_sum > 0:
+                    r -= 1
+                elif current_sum == 0:
+                    res.append([i, nums[l], nums[r]])
+                    l += 1
+                    while nums[l] == nums[l-1]:
+                        l += 1
+                        if l > r: break
+                    r -= 1
+                    while nums[r] == nums[r+1]:
+                        r -= 1
+                        if l > r: break
+                elif current_sum < 0:
+                    l += 1
+        return res
+
+"""
+Little to no problems. 
+bit confused on why we only really have to make sure there are no dups when incre/decre l and r for one
+just doing it on l works. Kinda assuming its just cause they don't have enough unit test for it. Since
+whenever we get a solution we increment both. 
+"""

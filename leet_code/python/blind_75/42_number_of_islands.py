@@ -52,3 +52,35 @@ class Solution:
                     islands += 1                            # it to the counter, so subsequent interations will just see 0s and can move on faster.
 
         return islands
+
+
+"""
+Came back the next day to see if I could do it, was able to figure it out. Overall simple enough.
+Found myself just doing depth first search. Maybe we should try another one with breath?
+I generally like the idea of going through a stack more since recuve is a bit harder to read
+but since this one is simple enough I guess its fine. 
+"""
+
+class Solution:
+    def numIslands(self, grid: List[List[str]]) -> int:
+        def dfsearch(row, column):
+            if 0 <= row < len(grid) and 0 <= column < len(grid[0]):
+                # row and column are valid, good to check
+                if grid[row][column] == '1':
+                    grid[row][column] = '0'
+                    dfsearch(row-1,column)
+                    dfsearch(row+1,column)
+                    dfsearch(row,column+1)
+                    dfsearch(row,column-1)
+            return  
+
+
+        islands = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == '1':                                   # remember i and j are ints and the values in grid are strings
+                    islands += 1
+                    dfsearch(i,j)
+
+        return islands
+

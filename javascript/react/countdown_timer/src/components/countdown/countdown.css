@@ -1,0 +1,15 @@
+.genericInput {
+    width: 10%;
+    margin: 5px;
+    box-sizing: border-box;
+}
+
+.genericButton {
+    border: solid;
+    margin: 5px;
+}
+
+.inputWrapper > b,
+.inputWrapper > div {
+    display: inline-flex;
+}

@@ -7,7 +7,7 @@ const CountdownTimer = () => {
     const [minute, setMinute] = useState(0);
     const [second, setSecond] = useState(0);
     const [allowNotifications, changeNotificationPermissions] = useState(false)
-    let askPermissionsBlocker = false
+    const [askPermissionsBlocker, setPersmissionBlocker] = useState(false)
 
     const askNotifcationPermissions = () => {
         if (askPermissionsBlocker){
@@ -15,28 +15,36 @@ const CountdownTimer = () => {
         }
         if (Notification.permission === "granted") {
             changeNotificationPermissions(true)
-            askPermissionsBlocker = true
+            setPersmissionBlocker(true)
             return;
         }
         if (!("Notification" in window)) {
             console.log("this browser does not support notifcations")
-            askPermissionsBlocker = true
+            setPersmissionBlocker(true)
             return;
         }
         Notification.requestPermission().then((result) => {
             if (result === "granted") {
                 changeNotificationPermissions(true)
-                askPermissionsBlocker = true
+                setPersmissionBlocker(true)
                 return;
             }
             else {
                 // permissions were denied. block asking again.
-                askPermissionsBlocker = true
+                setPersmissionBlocker(true)
             }
         })
     }
 
-    const sleep = ms => new Promise(r => setTimeout(r,ms));
+    useEffect(() => {
+        if (!timeStarted){
+            return;
+        }
+        const timer = setTimeout(() => {
+                moveTime()
+            }, 1000);
+        return () => clearTimeout(timer)
+    });
 
     const Pause = () => {
         setStartTime(false);
@@ -60,46 +68,33 @@ const CountdownTimer = () => {
         return;
     }
 
-    useEffect(() => {
-        async function moveTime() {
-            if ( !timeStarted ){
-                return;
+    const moveTime = () => {
+        if (hour > 0 || minute > 0 || second > 0) {
+            if (second === 0) {
+                // attempt to decrement minutes
+                if (minute === 0){
+                    // attempt to decrement hours, 
+                    // if hour is 0, you should never get this far
+                    setHour(hour - 1)
+                    setMinute(59)
+                }
+                else {
+                    setMinute(minute - 1)
+                }
+                setSecond(59)
             }
-            // main waiting of the "countdown"
-            await sleep(1000);
-
-            if (hour > 0 || minute > 0 || second > 0) {
-                if (second === 0) {
-                    // attempt to decrement minutes
-                    if (minute === 0){
-                        // attempt to decrement hours, 
-                        // if hour is 0, you should never get this far
-                        setHour(hour - 1)
-                        setMinute(59)
-                    }
-                    else {
-                        setMinute(minute - 1)
-                    }
-                    setSecond(59)
-                }
-                else{
-                    setSecond(second - 1)
-                }
-            }
-            else {
-                //your done, do whatever notification logic here
-                if (allowNotifications) {
-                    new Notification("Timer Done!", {body:"Timer Done!"})
-                }
-                console.log("all done!")
-                return;
+            else{
+                setSecond(second - 1)
             }
         }
-
-        // actual single execution of the above function
-        moveTime()
-
-    }), [second]
+        else {
+            //you're done, do whatever notification logic here
+            if (allowNotifications) {
+                new Notification("Timer Done!", {body:"Timer Done!"})
+            }
+            return;
+        }
+    }
 
     /// Component that allows entering times for countdown. Converts when start is hit
     const InputTimer = () => {

@@ -6,6 +6,35 @@ const CountdownTimer = () => {
     const [hour, setHour] = useState(0);
     const [minute, setMinute] = useState(0);
     const [second, setSecond] = useState(0);
+    const [allowNotifications, changeNotificationPermissions] = useState(false)
+    let askPermissionsBlocker = false
+
+    const askNotifcationPermissions = () => {
+        if (askPermissionsBlocker){
+            return;
+        }
+        if (Notification.permission === "granted") {
+            changeNotificationPermissions(true)
+            askPermissionsBlocker = true
+            return;
+        }
+        if (!("Notification" in window)) {
+            console.log("this browser does not support notifcations")
+            askPermissionsBlocker = true
+            return;
+        }
+        Notification.requestPermission().then((result) => {
+            if (result === "granted") {
+                changeNotificationPermissions(true)
+                askPermissionsBlocker = true
+                return;
+            }
+            else {
+                // permissions were denied. block asking again.
+                askPermissionsBlocker = true
+            }
+        })
+    }
 
     const sleep = ms => new Promise(r => setTimeout(r,ms));
 
@@ -26,6 +55,7 @@ const CountdownTimer = () => {
     }
 
     const Start = () => {
+        askNotifcationPermissions()
         setStartTime(true);
         return;
     }
@@ -58,6 +88,9 @@ const CountdownTimer = () => {
             }
             else {
                 //your done, do whatever notification logic here
+                if (allowNotifications) {
+                    new Notification("Timer Done!", {body:"Timer Done!"})
+                }
                 console.log("all done!")
                 return;
             }
